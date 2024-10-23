@@ -18,10 +18,10 @@ class my_alg:
 
         with open(filename, 'r', encoding='utf-8') as file:
             for line in file:
-                word = line.split(',')[0].strip()
-                # Проверяем, что слово состоит только из букв
-                if word.isalpha():
-                    word = word.lower()  # Приводим слово к нижнему регистру
+                # Извлекаем слова, состоящие только из кириллических букв
+                match = re.search(r'^\b([а-яА-Я]+)\b', line)
+                if match:
+                    word = match.group(1).lower()
                     if len(word) >= 6 and word[:3] == word[-3:]:
                         special_words.append(word)
 
