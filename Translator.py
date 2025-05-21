@@ -1,9 +1,15 @@
+import csv
+import sys
 
-def transformToCSV(pathToFile, sourceEncoding):
-    with open(pathToFile, 'rt', encoding=sourceEncoding) as f:
-        for line in f:
-            print(line)
-    return content
+def transformToCSV(pathToFile, outputFolder, sourceEncoding) -> None:
+    with open(outputFolder + '/output.csv', 'w', newline='') as fw:
+        writer = csv.writer(fw)
+    with open(pathToFile, 'rt', encoding=sourceEncoding) as fr:
+        for line in fr:
+            writer.writerow(line)
 
-def runner():
-    transformToCSV('./Ожегов_С._Толковый_словарь_русского_языка.txt', 'utf-8')
+def runner() -> None:
+    transformToCSV('/usr/src/app/Ожегов_С._Толковый_словарь_русского_языка.txt', '/output', 'utf-8')
+
+if __name__ == '__main__':
+    runner()
