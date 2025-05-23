@@ -32,7 +32,7 @@ def concatLines(fw, pathToFile, sourceEncoding) -> None:
                 line1 = extraLine
                 extraLineExists = True
             else:
-                if line1.find("\r\n"):
+                if line1.find("\r\n") != -1:
                     line1 = line1.replace("\r\n", " ") + extraLine
                 else:
                     line1 = line1.replace("\n", " ") + extraLine
