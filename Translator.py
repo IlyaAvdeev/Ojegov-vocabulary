@@ -11,10 +11,10 @@ def lineStartsWithCapitalLetter(line) -> bool:
 
 
 def dropEmptyLines(fw, pathToFile, sourceEncoding) -> None:
-        with open(pathToFile, 'rt', encoding=sourceEncoding) as fr:
-            for line in fr:
-                if len(line.strip()) > 0:
-                    fw.write(line)
+    with open(pathToFile, 'rt', encoding=sourceEncoding) as fr:
+        for line in fr:
+            if len(line.strip()) > 0:
+                fw.write(line)
 
 def concatLines(fw, pathToFile, sourceEncoding) -> None:
     with open(pathToFile, 'rt', encoding=sourceEncoding) as fr:
@@ -38,12 +38,34 @@ def concatLines(fw, pathToFile, sourceEncoding) -> None:
                     line1 = line1.replace("\n", " ") + extraLine
                 extraLineExists = True
 
+def extractHiddenWords(fw, pathToFile, sourceEncoding) -> None:
+    with open(pathToFile, 'rt', encoding=sourceEncoding) as fr:
+        for line in fr:
+            if lineStartsWithCapitalLetter(line) or len(line) == 0:
+                fw.write(line)
+            else:
+                print(line)
+                wordsInLine = line.split(" ")
+                for word in wordsInLine:
+                    if word.isUpper():
+                        index = line.find(word)
+                        fw.write(line[:index])
+                        fw.write("\n")
+                        fw.write(line[index:])
+                        print("Extracted: " + line[index:])
+
+
+
 def runner() -> None:
     workdir = os.environ.get('WORKDIR_PATH')
     outputdir = os.environ.get('OUTPPUTDIR_PATH')
 
+    with open(outputdir + '/extracted_hidden_words_vocabulary.txt', 'w', newline='') as fw:
+        extractHiddenWords(fw, outputdir + '/Ожегов_С._Толковый_словарь_русского_языка.txt', 'utf-8')
+    fw.close()
+
     with open(outputdir + '/compressed_vocabulary.txt', 'w', newline='') as fw:
-        dropEmptyLines(fw, workdir + '/Ожегов_С._Толковый_словарь_русского_языка.txt', 'utf-8')
+        dropEmptyLines(fw, workdir + '/extracted_hidden_words_vocabulary.txt', 'utf-8')
     fw.close()
 
     with open(outputdir + '/each_word_on_its_line_vocabulary.txt', 'w', newline='') as fw:
