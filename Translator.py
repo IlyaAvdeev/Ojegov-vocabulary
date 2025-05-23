@@ -16,6 +16,12 @@ def dropEmptyLines(fw, pathToFile, sourceEncoding) -> None:
             if len(line.strip()) > 0:
                 fw.write(line)
 
+def replaceSimilarLetters(fw, pathToFile, sourceEncoding) -> None:
+    with open(pathToFile, 'rt', encoding=sourceEncoding) as fr:
+        for line in fr:
+            newLine = line.replace("O", "О").replace("X", "Х").replace("P", "Р").replace("B", "В").replace("Y","У").replace("H", "Н").replace("A", "А").replace("C", "С").replace("E", "Е").replace("K", "К").replace("M", "М").replace("T", "Т")
+            fw.write(newLine)
+
 def concatLines(fw, pathToFile, sourceEncoding) -> None:
     with open(pathToFile, 'rt', encoding=sourceEncoding) as fr:
         line1 = fr.readline()
@@ -68,8 +74,12 @@ def runner() -> None:
     workdir = os.environ.get('WORKDIR_PATH')
     outputdir = os.environ.get('OUTPPUTDIR_PATH')
 
+    with open(outputdir + '/letters_replaced.txt', 'w', newline='') as fw:
+        replaceSimilarLetters(fw, workdir + '/Ожегов_С._Толковый_словарь_русского_языка.txt', 'utf-8')
+    fw.close()
+
     with open(outputdir + '/extracted_hidden_words_vocabulary.txt', 'w', newline='') as fw:
-        extractHiddenWords(fw, workdir + '/Ожегов_С._Толковый_словарь_русского_языка.txt', 'utf-8')
+        extractHiddenWords(fw, outputdir + '/letters_replaced.txt', 'utf-8')
     fw.close()
 
     with open(outputdir + '/compressed_vocabulary.txt', 'w', newline='') as fw:
