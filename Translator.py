@@ -19,7 +19,7 @@ def dropEmptyLines(fw, pathToFile, sourceEncoding) -> None:
 def replaceSimilarLetters(fw, pathToFile, sourceEncoding) -> None:
     with open(pathToFile, 'rt', encoding=sourceEncoding) as fr:
         for line in fr:
-            newLine = line.replace("O", "О").replace("X", "Х").replace("P", "Р").replace("B", "В").replace("Y","У").replace("H", "Н").replace("A", "А").replace("C", "С").replace("E", "Е").replace("K", "К").replace("M", "М").replace("T", "Т")
+            newLine = line.replace("Ь1", "Ы").replace("O", "О").replace("X", "Х").replace("P", "Р").replace("B", "В").replace("Y","У").replace("H", "Н").replace("A", "А").replace("C", "С").replace("E", "Е").replace("K", "К").replace("M", "М").replace("T", "Т")
             fw.write(newLine)
 
 def concatLines(fw, pathToFile, sourceEncoding) -> None:
