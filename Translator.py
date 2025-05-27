@@ -1,10 +1,13 @@
 import os
 
-# Checks whether line begins with capital russian letter or not.
-def lineStartsWithCapitalLetter(line) -> bool:
-    alphabet = list("АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЭЮЯ")
-    if line[0] in alphabet:
-        return True
+# Checks whether line begins with capitalized russian word or not.
+def lineStartsWithCapitalizedWord(line) -> bool:
+    wordsInLine = line.split(" ")
+    word = wordsInLine[0]
+    if word.isupper():
+        if len(word) > 2:
+            if (word != "-СЯ"):
+                return True
     return False
 
 # Удаляем все строки котоыре после отсечения пробелов и табуляций превращаются в пустую строку
@@ -43,7 +46,7 @@ def concatLines(fw, pathToFile, sourceEncoding) -> None:
                 if len(extraLine) == 0:
                     fw.write(line1)
                     break
-                if lineStartsWithCapitalLetter(extraLine):
+                if lineStartsWithCapitalizedWord(extraLine):
                     fw.write(line1)
                     line1 = extraLine
                     extraLineExists = False
@@ -61,7 +64,7 @@ def concatLines(fw, pathToFile, sourceEncoding) -> None:
 def extractHiddenWords(fw, pathToFile, sourceEncoding) -> None:
     with open(pathToFile, 'rt', encoding=sourceEncoding) as fr:
         for line in fr:
-            wordsInLine = line.split(" ")
+            wordsInLine = line.strip().split(" ")
             for word in wordsInLine:
                 if word.isupper():
                     if len(word) > 2:
