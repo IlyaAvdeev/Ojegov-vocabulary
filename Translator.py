@@ -61,26 +61,15 @@ def concatLines(fw, pathToFile, sourceEncoding) -> None:
 def extractHiddenWords(fw, pathToFile, sourceEncoding) -> None:
     with open(pathToFile, 'rt', encoding=sourceEncoding) as fr:
         for line in fr:
-            if len(line.strip()) == 0:
-                fw.write(line)
-            # elif lineStartsWithCapitalLetter(line.strip()):
-            #    fw.write(line)
-            else:
-                wordsInLine = line.split(" ")
-                newWordFound = False
-                for word in wordsInLine:
-                    if word.isupper():
-                        if len(word) > 2:
-                            index = line.find(word)
-                            fw.write(line[:index])
+            wordsInLine = line.split(" ")
+            for word in wordsInLine:
+                if word.isupper():
+                    if len(word) > 2:
+                        if (word != "-СЯ"):
                             fw.write("\n")
-                            fw.write(line[index:])
-                            print(line)
-                            print("Extracted: " + line[index:])
-                            newWordFound = True
-                            break
-                if newWordFound == False:
-                    fw.write(line)
+                fw.write(word)
+                fw.write(" ")
+
 
 def runner() -> None:
     workdir = os.environ.get('WORKDIR_PATH')
