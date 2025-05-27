@@ -8,8 +8,6 @@ def lineStartsWithCapitalLetter(line) -> bool:
         return True
     return False
 
-
-
 def dropEmptyLines(fw, pathToFile, sourceEncoding) -> None:
     with open(pathToFile, 'rt', encoding=sourceEncoding) as fr:
         for line in fr:
@@ -24,25 +22,26 @@ def replaceSimilarLetters(fw, pathToFile, sourceEncoding) -> None:
 
 def concatLines(fw, pathToFile, sourceEncoding) -> None:
     with open(pathToFile, 'rt', encoding=sourceEncoding) as fr:
-        line1 = fr.readline()
-        if len(line1) == 0:
-            return
-        extraLineExists = True
-        while extraLineExists:
-            extraLine = fr.readline()
-            if len(extraLine) == 0:
-                fw.write(line1)
-                break
-            if lineStartsWithCapitalLetter(extraLine):
-                fw.write(line1)
-                line1 = extraLine
-                extraLineExists = True
-            else:
-                if line1.find("\r\n") != -1:
-                    line1 = line1.replace("\r\n", " ") + extraLine
+        while True:
+            line1 = fr.readline()
+            if len(line1) == 0:
+                return
+            extraLineExists = True
+            while extraLineExists:
+                extraLine = fr.readline()
+                if len(extraLine) == 0:
+                    fw.write(line1)
+                    break
+                if lineStartsWithCapitalLetter(extraLine):
+                    fw.write(line1)
+                    line1 = extraLine
+                    extraLineExists = False
                 else:
-                    line1 = line1.replace("\n", " ") + extraLine
-                extraLineExists = True
+                    if line1.find("\r\n") != -1:
+                        line1 = line1.replace("\r\n", " ") + extraLine
+                    else:
+                        line1 = line1.replace("\n", " ") + extraLine
+                    extraLineExists = True
 
 def extractHiddenWords(fw, pathToFile, sourceEncoding) -> None:
     with open(pathToFile, 'rt', encoding=sourceEncoding) as fr:
@@ -67,8 +66,6 @@ def extractHiddenWords(fw, pathToFile, sourceEncoding) -> None:
                             break
                 if newWordFound == False:
                     fw.write(line)
-
-
 
 def runner() -> None:
     workdir = os.environ.get('WORKDIR_PATH')
