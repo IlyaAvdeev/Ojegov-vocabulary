@@ -12,8 +12,7 @@ def lineStartsWithCapitalizedWord(line) -> bool:
     word = wordsInLine[0]
     if word.isupper():
         if len(word) > 2:
-            if (word != "-СЯ"):
-                return True
+           return True
     return False
 
 # Удаляем все строки котоыре после отсечения пробелов и табуляций превращаются в пустую строку
@@ -38,8 +37,11 @@ def replaceSimilarLetters(fw, pathToFile, sourceEncoding) -> None:
 В итоге должны получить документ в котором в начале строки находится трактуемое слово, но может получиться так что в строке есть 
 ещё другие трактуемые слова
 """
-def concatLines(fw, pathToFile, sourceEncoding) -> None:
+def concatLines(fw, skipLines, pathToFile, sourceEncoding) -> None:
     with open(pathToFile, 'rt', encoding=sourceEncoding) as fr:
+        for i in range(0,skipLines):
+            fw.write(fr.readline())
+
         extraLineExists = True
         while True:
             if extraLineExists:
@@ -76,7 +78,7 @@ def extractInlinedWords(fw, pathToFile, sourceEncoding) -> None:
                 clearedWord = extractWordFromString(word)
                 if clearedWord.isupper():
                     if firstWord in ("АББРЕВИАТУРА", "АВСТРОАЗИАТСКИЙ", "АВТОМАТИЗИРОВАТЬ", "АЖ", "АЙ", "АМЕРИКАНСКИЙ", "АНТИСОВЕТИЗМ",
-                                     "АПАЧИ", "АССИРИЙЦЫ", "АССОРТИМЕНТ", "БАКС", "БАЮ-БАЙ", "БАЯДЕРА", "БЕЙ", "БЕЛО"):
+                                     "АПАЧИ", "АССИРИЙЦЫ", "АССОРТИМЕНТ", "БАКС", "БАЮ-БАЙ", "БАЯДЕРА", "БЕЙ", "БЕЛО…", "БЕРЁСТА", "БЫЧАЧИЙ"):
                         fw.write(word)
                         fw.write(" ")
                         continue
@@ -104,7 +106,7 @@ def extractFirstWordFromLine(line):
 def extractWordFromString(str):
     if len(str) == 0:
         return ""
-    extractedWord = str.lstrip().rstrip(",:.123456789")
+    extractedWord = str.lstrip().rstrip(",:.123456789!")
     return extractedWord
 
 def runner() -> None:
@@ -124,6 +126,11 @@ def runner() -> None:
     # 3. Вычищаем из файла все пустые строки
     with open(outputdir + '/03.compressed_vocabulary.txt', 'w', newline='') as fw:
         dropEmptyLines(fw, outputdir + '/02.extracted_hidden_words_vocabulary.txt', 'utf-8')
+    fw.close()
+
+    # 4. Слепить вместе строки которые жизнь разбросала по разным линиям
+    with open(outputdir + '/04.concat_lines.txt', 'w', newline='') as fw:
+        concatLines(fw, 5, outputdir + '/03.compressed_vocabulary.txt', 'utf-8')
     fw.close()
 
 if __name__ == '__main__':
