@@ -1,5 +1,11 @@
 import os
 
+def lineStartsWithCapitalLetter(line) -> bool:
+    alphabet = list("АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЭЮЯ")
+    if line[0] in alphabet:
+        return True
+    return False
+
 # Checks whether line begins with capitalized russian word or not.
 def lineStartsWithCapitalizedWord(line) -> bool:
     wordsInLine = line.split(" ")
@@ -24,7 +30,7 @@ def dropEmptyLines(fw, pathToFile, sourceEncoding) -> None:
 def replaceSimilarLetters(fw, pathToFile, sourceEncoding) -> None:
     with open(pathToFile, 'rt', encoding=sourceEncoding) as fr:
         for line in fr:
-            newLine = line.replace("Ь1", "Ы").replace("O", "О").replace("X", "Х").replace("P", "Р").replace("B", "В").replace("Y","У").replace("H", "Н").replace("A", "А").replace("C", "С").replace("E", "Е").replace("K", "К").replace("M", "М").replace("T", "Т")
+            newLine = line.replace("...", "…").replace("O", "О").replace("X", "Х").replace("P", "Р").replace("B", "В").replace("Y","У").replace("H", "Н").replace("A", "А").replace("C", "С").replace("E", "Е").replace("K", "К").replace("M", "М").replace("T", "Т")
             fw.write(newLine)
 
 """
@@ -61,41 +67,59 @@ def concatLines(fw, pathToFile, sourceEncoding) -> None:
 Разбирает каждую строку по словам и проверяем нет ли в строке слов в верхнем регистре длиной более 2 символов.
 Если есть, то расчленяет исходную строку на несколько.
 """
-def extractHiddenWords(fw, pathToFile, sourceEncoding) -> None:
+def extractInlinedWords(fw, pathToFile, sourceEncoding) -> None:
     with open(pathToFile, 'rt', encoding=sourceEncoding) as fr:
         for line in fr:
+            firstWord = extractFirstWordFromLine(line)
+            """
+            if firstWord in ("АББРЕВИАТУРА", "АВТОМАТИЗИРОВАТЬ"):
+                fw.write(line)
+                fw.write('\n')
+                continue
+            """
             wordsInLine = line.strip().split(" ")
             for word in wordsInLine:
-                if word.isupper():
-                    if len(word) > 2:
-                        if word not in ("-СЯ", "-СЯ1", "СМ.", "-СЯ,", "СССР" , "-Ы,М.", "И.Ж.", "-ЯЮ,", "СССР).", "-ЯЮ,", "-СЯ2", "ООН).", "(ТЕ)", "США.", "(V),", "III", "IV.", "(ИТР).", "К.!", "США", "-И,", "ЭВМ.", "К°)", "(ЭВМ).", "СССР:", "(ВЛКСМ)", "(ВЛКСМ).", "(И)", "\"И\"", "СССР.", "II-", "М.,", "-ТИЙ,", "США,", "\"М.\".", "М.-ЭВМ.", "М.?", "(СУЩ.).", "-А,М.", "III.", "II.", "Н.,", "Н.!", "НЫЙ,", ".Н.", "НЛО).", "-А."):
-                            fw.write("\n")
-                fw.write(word)
-                fw.write(" ")
+                clearedWord = extractWordFromString(word)
+                if clearedWord.isupper():
+                    if len(clearedWord) > 2:
+                        fw.write("\n")
+                        fw.write(clearedWord)
+                        fw.write(", ")
+                else:
+                    fw.write(word)
+                    fw.write(" ")
 
+
+def extractFirstWordFromLine(line):
+    if len(line) == 0:
+        return ""
+    wordsInLine = line.strip().split(" ")
+    firstWord = extractWordFromString(wordsInLine[0])
+    return firstWord
+
+def extractWordFromString(str):
+    if len(str) == 0:
+        return ""
+    extractedWord = str.lstrip().rstrip(",:.123456789")
+    return extractedWord
 
 def runner() -> None:
     workdir = os.environ.get('WORKDIR_PATH')
     outputdir = os.environ.get('OUTPPUTDIR_PATH')
 
     # 1. Заменяем все русские символы которые распознались как латиница на русские схожие по написанию.
-    with open(outputdir + '/letters_replaced.txt', 'w', newline='') as fw:
+    with open(outputdir + '/01.letters_replaced.txt', 'w', newline='') as fw:
         replaceSimilarLetters(fw, workdir + '/Ожегов_С._Толковый_словарь_русского_языка.txt', 'utf-8')
     fw.close()
 
     # 2. Просмотриваем каждую строку на предмет наличия в ней других слов
-    with open(outputdir + '/extracted_hidden_words_vocabulary.txt', 'w', newline='') as fw:
-        extractHiddenWords(fw, outputdir + '/letters_replaced.txt', 'utf-8')
+    with open(outputdir + '/02.extracted_hidden_words_vocabulary.txt', 'w', newline='') as fw:
+        extractInlinedWords(fw, outputdir + '/01.letters_replaced.txt', 'utf-8')
     fw.close()
 
     # 3. Вычищаем из файла все пустые строки
-    with open(outputdir + '/compressed_vocabulary.txt', 'w', newline='') as fw:
-        dropEmptyLines(fw, outputdir + '/extracted_hidden_words_vocabulary.txt', 'utf-8')
-    fw.close()
-
-    # 4. объединяем все строки относящиеся к одному слову в одну строку. В итоге каждую строку должно занимать своё слово
-    with open(outputdir + '/each_word_on_its_line_vocabulary.txt', 'w', newline='') as fw:
-        concatLines(fw, outputdir + '/compressed_vocabulary.txt', 'utf-8')
+    with open(outputdir + '/03.compressed_vocabulary.txt', 'w', newline='') as fw:
+        dropEmptyLines(fw, outputdir + '/02.extracted_hidden_words_vocabulary.txt', 'utf-8')
     fw.close()
 
 if __name__ == '__main__':
