@@ -76,7 +76,7 @@ def extractInlinedWords(fw, pathToFile, sourceEncoding) -> None:
                 clearedWord = extractWordFromString(word)
                 if clearedWord.isupper():
                     if firstWord in ("АББРЕВИАТУРА", "АВСТРОАЗИАТСКИЙ", "АВТОМАТИЗИРОВАТЬ", "АЖ", "АЙ", "АМЕРИКАНСКИЙ", "АНТИСОВЕТИЗМ",
-                                     "АПАЧИ", "АССИРИЙЦЫ", "АССОРТИМЕНТ"):
+                                     "АПАЧИ", "АССИРИЙЦЫ", "АССОРТИМЕНТ", "БАКС", "БАЮ-БАЙ", "БАЯДЕРА", "БЕЙ", "БЕЛО"):
                         fw.write(word)
                         fw.write(" ")
                         continue
