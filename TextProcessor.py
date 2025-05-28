@@ -71,12 +71,6 @@ def extractInlinedWords(fw, pathToFile, sourceEncoding) -> None:
     with open(pathToFile, 'rt', encoding=sourceEncoding) as fr:
         for line in fr:
             firstWord = extractFirstWordFromLine(line)
-            """
-            if firstWord in ("АББРЕВИАТУРА", "АВТОМАТИЗИРОВАТЬ"):
-                fw.write(line)
-                fw.write('\n')
-                continue
-            """
             wordsInLine = line.strip().split(" ")
             for word in wordsInLine:
                 clearedWord = extractWordFromString(word)
@@ -85,9 +79,14 @@ def extractInlinedWords(fw, pathToFile, sourceEncoding) -> None:
                         fw.write("\n")
                         fw.write(clearedWord)
                         fw.write(", ")
+                    else:
+                        fw.write(word)
+                        fw.write(" ")
                 else:
                     fw.write(word)
                     fw.write(" ")
+            fw.write("\n")
+
 
 
 def extractFirstWordFromLine(line):
