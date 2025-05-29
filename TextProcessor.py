@@ -88,6 +88,13 @@ def concatLines(fw, skipLines, pathToFile, sourceEncoding) -> None:
                     strippedLine = strippedNextLine
                     checkFollowingLines = True
 
+def findInconsistencies(pathToFile, sourceEncoding) -> None:
+    with open(pathToFile, 'rt', encoding=sourceEncoding) as fr:
+        for line in fr:
+            if len(line) < 20:
+                print(line)
+
+
 """
 Разбирает каждую строку по словам и проверяем нет ли в строке слов в верхнем регистре длиной более 2 символов.
 Если есть, то расчленяет исходную строку на несколько.
@@ -102,7 +109,9 @@ def extractInlinedWords(fw, pathToFile, sourceEncoding) -> None:
                 if clearedWord.isupper():
                     if firstWord in ("АББРЕВИАТУРА", "АВСТРОАЗИАТСКИЙ", "АВТОМАТИЗИРОВАТЬ", "АЖ", "АЙ", "АМЕРИКАНСКИЙ", "АНТИСОВЕТИЗМ",
                                      "АПАЧИ", "АССИРИЙЦЫ", "АССОРТИМЕНТ", "БАКС", "БАЮ-БАЙ", "БАЯДЕРА", "БЕЙ", "БЕЛО…", "БЕРЁСТА", "БЫЧАЧИЙ",
-                                     "ЭПИЛЕПСИЯ", "ЭЛЕКТРОННО-ВЫЧИСЛИТЕЛЬНЫЙ", "ЭГЕ", "ЭНПИКЛОПЕДИЧНЫЙ", "ЭЗОПОВСКИЙ", "ЯРКО…", "СЕНАТ", "БАЙ"
+                                     "ЭПИЛЕПСИЯ", "ЭЛЕКТРОННО-ВЫЧИСЛИТЕЛЬНЫЙ", "ЭГЕ", "ЭНПИКЛОПЕДИЧНЫЙ", "ЭЗОПОВСКИЙ", "ЯРКО…", "СЕНАТ", "БАЙ",
+                        "АНГЛО…", "АПОПЛЕКСИЯ", "БАЗИЛИКА", "БАРХАТКА", "ЯРЫГА", "ЯХТ…", "ЯЗЫКОЗНАНИЕ", "ЯГОДИЦА", "ШКВОРЕНЬ", "ШИЛОХВОСТЬ",
+                        "ШВОРЕНЬ", "ЧТОБ", "ЧИСТО-…", "ЧИК-ЧИРИК", "ЧИНАРА", "ЧЕРНОБЫЛЬНИК", "ЧЕРНО…", "ЧЕРВИ", "ЧЕЛОВЕКО…", "ЧАРДАШ",
                                      ):
                         fw.write(word)
                         fw.write(" ")
@@ -157,6 +166,9 @@ def runner() -> None:
     with open(outputdir + '/04.concat_lines.txt', 'w', newline='') as fw:
         concatLines(fw, 4, outputdir + '/03.compressed_vocabulary.txt', 'utf-8')
     fw.close()
+
+    # 5. Выводим подозрительные слова
+    findInconsistencies(outputdir + '/04.concat_lines.txt', 'utf-8')
 
 if __name__ == '__main__':
     runner()
