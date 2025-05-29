@@ -49,9 +49,7 @@ def concatLines(fw, skipLines, pathToFile, sourceEncoding) -> None:
             #print("---Stripped line:" + strippedLine)
             if len(strippedLine) == 1: # в этом случае это переключение на новую букву
                 currentLetter = strippedLine[0]
-                fw.write(currentLetter)
-                fw.write('\n')
-                #print("New letter:" + currentLetter)
+                # print("New letter:" + currentLetter, strippedLine)
                 continue
             elif len(strippedLine) == 0: # значит файл закончился
                 #print("!!!!End of file")
@@ -70,9 +68,8 @@ def concatLines(fw, skipLines, pathToFile, sourceEncoding) -> None:
                 if len(strippedNextLine) == 1: #значит начинается новая буква
                     currentLetter = strippedNextLine[0]
                     fw.write(strippedLine)
-                    fw.write(currentLetter)
                     fw.write('\n')
-                    #print("Новая буква в next line:", currentLetter)
+                    # print("Новая буква в next line:", currentLetter, strippedLine)
                     break
 
                 # ---------------------------------------------------------------------------------
@@ -105,7 +102,7 @@ def extractInlinedWords(fw, pathToFile, sourceEncoding) -> None:
                 if clearedWord.isupper():
                     if firstWord in ("АББРЕВИАТУРА", "АВСТРОАЗИАТСКИЙ", "АВТОМАТИЗИРОВАТЬ", "АЖ", "АЙ", "АМЕРИКАНСКИЙ", "АНТИСОВЕТИЗМ",
                                      "АПАЧИ", "АССИРИЙЦЫ", "АССОРТИМЕНТ", "БАКС", "БАЮ-БАЙ", "БАЯДЕРА", "БЕЙ", "БЕЛО…", "БЕРЁСТА", "БЫЧАЧИЙ",
-                                     "ЭПИЛЕПСИЯ", "ЭЛЕКТРОННО-ВЫЧИСЛИТЕЛЬНЫЙ", "ЭГЕ", "ЭНПИКЛОПЕДИЧНЫЙ", "ЭЗОПОВСКИЙ", "ЯРКО…"
+                                     "ЭПИЛЕПСИЯ", "ЭЛЕКТРОННО-ВЫЧИСЛИТЕЛЬНЫЙ", "ЭГЕ", "ЭНПИКЛОПЕДИЧНЫЙ", "ЭЗОПОВСКИЙ", "ЯРКО…", "СЕНАТ", "БАЙ"
                                      ):
                         fw.write(word)
                         fw.write(" ")
