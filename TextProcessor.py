@@ -33,14 +33,32 @@ def replaceSimilarLetters(fw, pathToFile, sourceEncoding) -> None:
             fw.write(newLine)
 
 """
+Пропускаем первые skipLines строк и 
 объединяем все соседние строки в одну если последующие строки относятся к слову из первой строки. 
-В итоге должны получить документ в котором в начале строки находится трактуемое слово, но может получиться так что в строке есть 
-ещё другие трактуемые слова
+В итоге должны получить документ в котором в начале строки находится трактуемое слово
 """
 def concatLines(fw, skipLines, pathToFile, sourceEncoding) -> None:
     with open(pathToFile, 'rt', encoding=sourceEncoding) as fr:
         for i in range(0,skipLines):
             fw.write(fr.readline())
+
+        for line in fr:
+            currentLetter = ''
+            strippedLine = line.strip()
+            if len(strippedLine) == 1:
+                currentLetter = line[0] #текущая буква на которую будут начинаться все последующие слова
+                continue
+
+
+
+
+
+
+
+
+
+
+
 
         extraLineExists = True
         while True:
