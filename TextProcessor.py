@@ -46,12 +46,15 @@ def concatLines(fw, skipLines, pathToFile, sourceEncoding) -> None:
         for line in fr:
             # --- предварительные проверки главной строки
             strippedLine = line.strip()
+            #print("---Stripped line:" + strippedLine)
             if len(strippedLine) == 1: # в этом случае это переключение на новую букву
                 currentLetter = strippedLine[0]
                 fw.write(currentLetter)
                 fw.write('\n')
+                #print("New letter:" + currentLetter)
                 continue
             elif len(strippedLine) == 0: # значит файл закончился
+                #print("!!!!End of file")
                 return
 
             checkFollowingLines = True
@@ -59,30 +62,34 @@ def concatLines(fw, skipLines, pathToFile, sourceEncoding) -> None:
                 # --- предварительные проверки последующих строк которые в том числе потенциально могут быть частью главной строки
                 nextLine = fr.readline()
                 strippedNextLine = nextLine.strip()
+                #print("Stripped next line:" + strippedNextLine)
                 if len(strippedNextLine) == 0: #значит документ закончился и строк более нет
-                    fw.write(line)
+                    #print("!!!!End of file inside next line")
+                    fw.write(strippedLine)
                     return
                 if len(strippedNextLine) == 1: #значит начинается новая буква
                     currentLetter = strippedNextLine[0]
-                    fw.write(line)
+                    fw.write(strippedLine)
                     fw.write(currentLetter)
                     fw.write('\n')
+                    #print("Новая буква в next line:", currentLetter)
                     break
 
                 # ---------------------------------------------------------------------------------
                 # --- с этого момента обрабатываем обычную строку (НЕ новая буква, НЕ конец файла)
                 # ---------------------------------------------------------------------------------
                 if strippedNextLine[0] != currentLetter[0]: # следующая считанная строка отличается от текущей буквы по которой обрабатываем
+                    #print("Первые буквы неравны:", strippedNextLine, currentLetter)
                     if strippedLine.find("\r\n") != -1:
                         strippedLine = strippedLine.replace("\r\n", " ") + strippedNextLine
                     else:
                         strippedLine = strippedLine.replace("\n", " ") + strippedNextLine
                 else:
+                    #print("Первые буквы равны:", strippedNextLine, strippedLine)
                     fw.write(strippedLine)
                     fw.write('\n')
-                    fw.write(strippedNextLine)
-                    fw.write('\n')
-                    checkFollowingLines = False
+                    strippedLine = strippedNextLine
+                    checkFollowingLines = True
 
 """
 Разбирает каждую строку по словам и проверяем нет ли в строке слов в верхнем регистре длиной более 2 символов.
@@ -98,7 +105,7 @@ def extractInlinedWords(fw, pathToFile, sourceEncoding) -> None:
                 if clearedWord.isupper():
                     if firstWord in ("АББРЕВИАТУРА", "АВСТРОАЗИАТСКИЙ", "АВТОМАТИЗИРОВАТЬ", "АЖ", "АЙ", "АМЕРИКАНСКИЙ", "АНТИСОВЕТИЗМ",
                                      "АПАЧИ", "АССИРИЙЦЫ", "АССОРТИМЕНТ", "БАКС", "БАЮ-БАЙ", "БАЯДЕРА", "БЕЙ", "БЕЛО…", "БЕРЁСТА", "БЫЧАЧИЙ",
-                                     "ЭПИЛЕПСИЯ"
+                                     "ЭПИЛЕПСИЯ", "ЭЛЕКТРОННО-ВЫЧИСЛИТЕЛЬНЫЙ", "ЭГЕ", "ЭНПИКЛОПЕДИЧНЫЙ", "ЭЗОПОВСКИЙ", "ЯРКО…"
                                      ):
                         fw.write(word)
                         fw.write(" ")
