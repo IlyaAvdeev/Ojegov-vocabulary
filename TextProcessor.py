@@ -42,46 +42,47 @@ def concatLines(fw, skipLines, pathToFile, sourceEncoding) -> None:
         for i in range(0,skipLines):
             fw.write(fr.readline())
 
+        currentLetter = ''
         for line in fr:
-            currentLetter = ''
+            # --- предварительные проверки главной строки
             strippedLine = line.strip()
-            if len(strippedLine) == 1:
-                currentLetter = line[0] #текущая буква на которую будут начинаться все последующие слова
+            if len(strippedLine) == 1: # в этом случае это переключение на новую букву
+                currentLetter = strippedLine[0]
+                fw.write(currentLetter)
+                fw.write('\n')
                 continue
-
-
-
-
-
-
-
-
-
-
-
-
-        extraLineExists = True
-        while True:
-            if extraLineExists:
-                line1 = fr.readline()
-            if len(line1) == 0:
+            elif len(strippedLine) == 0: # значит файл закончился
                 return
-            extraLineExists = True
-            while extraLineExists:
-                extraLine = fr.readline()
-                if len(extraLine) == 0:
-                    fw.write(line1)
+
+            checkFollowingLines = True
+            while checkFollowingLines:
+                # --- предварительные проверки последующих строк которые в том числе потенциально могут быть частью главной строки
+                nextLine = fr.readline()
+                strippedNextLine = nextLine.strip()
+                if len(strippedNextLine) == 0: #значит документ закончился и строк более нет
+                    fw.write(line)
+                    return
+                if len(strippedNextLine) == 1: #значит начинается новая буква
+                    currentLetter = strippedNextLine[0]
+                    fw.write(line)
+                    fw.write(currentLetter)
+                    fw.write('\n')
                     break
-                if lineStartsWithCapitalizedWord(extraLine):
-                    fw.write(line1)
-                    line1 = extraLine
-                    extraLineExists = False
-                else:
-                    if line1.find("\r\n") != -1:
-                        line1 = line1.replace("\r\n", " ") + extraLine
+
+                # ---------------------------------------------------------------------------------
+                # --- с этого момента обрабатываем обычную строку (НЕ новая буква, НЕ конец файла)
+                # ---------------------------------------------------------------------------------
+                if strippedNextLine[0] != currentLetter[0]: # следующая считанная строка отличается от текущей буквы по которой обрабатываем
+                    if strippedLine.find("\r\n") != -1:
+                        strippedLine = strippedLine.replace("\r\n", " ") + strippedNextLine
                     else:
-                        line1 = line1.replace("\n", " ") + extraLine
-                    extraLineExists = True
+                        strippedLine = strippedLine.replace("\n", " ") + strippedNextLine
+                else:
+                    fw.write(strippedLine)
+                    fw.write('\n')
+                    fw.write(strippedNextLine)
+                    fw.write('\n')
+                    checkFollowingLines = False
 
 """
 Разбирает каждую строку по словам и проверяем нет ли в строке слов в верхнем регистре длиной более 2 символов.
@@ -96,7 +97,9 @@ def extractInlinedWords(fw, pathToFile, sourceEncoding) -> None:
                 clearedWord = extractWordFromString(word)
                 if clearedWord.isupper():
                     if firstWord in ("АББРЕВИАТУРА", "АВСТРОАЗИАТСКИЙ", "АВТОМАТИЗИРОВАТЬ", "АЖ", "АЙ", "АМЕРИКАНСКИЙ", "АНТИСОВЕТИЗМ",
-                                     "АПАЧИ", "АССИРИЙЦЫ", "АССОРТИМЕНТ", "БАКС", "БАЮ-БАЙ", "БАЯДЕРА", "БЕЙ", "БЕЛО…", "БЕРЁСТА", "БЫЧАЧИЙ"):
+                                     "АПАЧИ", "АССИРИЙЦЫ", "АССОРТИМЕНТ", "БАКС", "БАЮ-БАЙ", "БАЯДЕРА", "БЕЙ", "БЕЛО…", "БЕРЁСТА", "БЫЧАЧИЙ",
+                                     "ЭПИЛЕПСИЯ"
+                                     ):
                         fw.write(word)
                         fw.write(" ")
                         continue
@@ -148,7 +151,7 @@ def runner() -> None:
 
     # 4. Слепить вместе строки которые жизнь разбросала по разным линиям
     with open(outputdir + '/04.concat_lines.txt', 'w', newline='') as fw:
-        concatLines(fw, 5, outputdir + '/03.compressed_vocabulary.txt', 'utf-8')
+        concatLines(fw, 4, outputdir + '/03.compressed_vocabulary.txt', 'utf-8')
     fw.close()
 
 if __name__ == '__main__':
