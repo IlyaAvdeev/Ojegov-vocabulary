@@ -1,4 +1,6 @@
 output
 .venv
 .idea
+db_content
+result
 

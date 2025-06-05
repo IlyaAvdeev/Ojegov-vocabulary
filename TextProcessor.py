@@ -1,4 +1,6 @@
 import os
+import psycopg2
+from psycopg2 import Error
 
 def lineStartsWithCapitalLetter(line) -> bool:
     alphabet = list("АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЭЮЯ")
@@ -304,6 +306,35 @@ def runner() -> None:
 
     # 5. Выводим подозрительные слова
     findInconsistencies(outputdir + '/04.concat_lines.txt', 4, 'utf-8')
+
+    # 6. Засовываем всё что напарсили в БД
+    try:
+        with psycopg2.connect(
+                dbname="words",
+                user="postgres",
+                password="password",
+                host="172.17.0.1",
+                port="5432"
+        ) as conn:
+            with conn.cursor() as cur:
+                try:
+                    with open(outputdir + '/04.concat_lines.txt', 'rt', encoding='utf-8') as fr:
+                        for i in range(4):
+                            fr.readline()
+                        counter = 0
+                        for line in fr:
+                            word = extractFirstWordFromLine(line)
+                            cur.execute("INSERT INTO public.ojegov(word, explanation) VALUES (lower(%s), %s);", (word, line[len(word):].lstrip(',').strip()))
+                            counter = counter + 1
+                            if counter % 100 == 0:
+                                conn.commit()
+                                print(f"Committed transaction after: {counter}")
+                        conn.commit()
+                except Error as e:
+                    conn.rollback()
+                    print(f"Transaction failed: {e.pgcode} - {e.pgerror}")
+    except Exception as e:
+        print(f"The error has occurred. Details: {e}")
 
 if __name__ == '__main__':
     runner()
